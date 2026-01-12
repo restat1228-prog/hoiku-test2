@@ -1,0 +1,1335 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>発達所見メーカー（場面×選択式）</title>
+  <style>
+    :root{
+      --bd:#e5e7eb; --tx:#0f172a; --mut:#64748b; --bg:#f8fafc;
+      --pri:#0ea5e9; --pri2:#0284c7; --danger:#ef4444;
+      --chip:#ffffff; --chipOn:#e0f2fe;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif;
+      color:var(--tx);
+      background:white;
+    }
+    header{
+      position:sticky; top:0; z-index:20;
+      border-bottom:1px solid var(--bd);
+      background:white;
+    }
+    .head{
+      max-width:1200px; margin:0 auto; padding:12px 16px;
+      display:flex; gap:12px; align-items:center; justify-content:space-between;
+    }
+    .title{ display:flex; flex-direction:column; gap:2px; }
+    .title h1{ margin:0; font-size:16px; }
+    .title p{ margin:0; font-size:12px; color:var(--mut); }
+    .topActions{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    button, input, select, textarea{
+      font:inherit;
+      border:1px solid var(--bd);
+      border-radius:10px;
+      padding:10px;
+      background:white;
+    }
+    button{ cursor:pointer; }
+    button.primary{
+      background:var(--pri); border-color:var(--pri); color:white;
+    }
+    button.primary:hover{ background:var(--pri2); border-color:var(--pri2); }
+    button.ghost{ background:white; }
+    button.danger{
+      background:var(--danger); border-color:var(--danger); color:white;
+    }
+    .wrap{ max-width:1200px; margin:0 auto; padding:16px; }
+    .grid{
+      display:grid; grid-template-columns: 1fr; gap:12px;
+    }
+    @media(min-width: 1060px){
+      .grid{ grid-template-columns: 1.15fr 0.85fr; }
+    }
+    .card{
+      border:1px solid var(--bd);
+      border-radius:14px;
+      background:white;
+      padding:12px;
+    }
+    .card h2{ margin:0 0 10px; font-size:14px; }
+    .muted{ color:var(--mut); font-size:12px; }
+    .row{ display:grid; grid-template-columns:1fr; gap:8px; }
+    @media(min-width: 760px){
+      .row.cols2{ grid-template-columns:1fr 1fr; }
+      .row.cols3{ grid-template-columns:1fr 1fr 1fr; }
+    }
+    label{ display:block; font-size:12px; color:var(--mut); margin-bottom:4px; }
+    textarea{ width:100%; min-height:92px; resize:vertical; line-height:1.5; }
+    .tabs{
+      display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;
+    }
+    .tab{
+      padding:8px 10px; border:1px solid var(--bd); border-radius:999px;
+      background:var(--bg); color:var(--mut); font-size:12px;
+      cursor:pointer; user-select:none;
+    }
+    .tab.on{ background:white; color:var(--tx); border-color:var(--pri); }
+    .sectionTitle{
+      display:flex; align-items:center; justify-content:space-between; gap:8px;
+      margin:8px 0;
+    }
+    .sectionTitle h3{ margin:0; font-size:13px; }
+    .pill{
+      display:inline-block; padding:3px 8px; border:1px solid var(--bd);
+      border-radius:999px; font-size:11px; color:var(--mut); background:var(--bg);
+    }
+    .chips{
+      display:flex; flex-wrap:wrap; gap:8px;
+    }
+    .chip{
+      border:1px solid var(--bd);
+      border-radius:999px;
+      padding:8px 10px;
+      background:var(--chip);
+      font-size:12px;
+      line-height:1.1;
+      cursor:pointer;
+      user-select:none;
+    }
+    .chip.on{
+      background:var(--chipOn);
+      border-color:var(--pri);
+    }
+    .chip small{ color:var(--mut); font-size:11px; }
+    details{
+      border:1px solid var(--bd);
+      border-radius:14px;
+      padding:10px;
+      background:white;
+    }
+    details summary{
+      cursor:pointer; list-style:none;
+      display:flex; align-items:center; justify-content:space-between; gap:8px;
+      font-weight:600; font-size:13px;
+    }
+    details summary::-webkit-details-marker{ display:none; }
+    .domainBadge{
+      display:flex; gap:8px; align-items:center;
+    }
+    .count{
+      font-size:11px; color:var(--mut); background:var(--bg);
+      border:1px solid var(--bd); padding:3px 8px; border-radius:999px;
+    }
+    .toolsLine{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .mini{ padding:6px 8px; font-size:12px; border-radius:999px; }
+    .hr{ height:1px; background:var(--bd); margin:10px 0; border:0; }
+    .sticky{
+      position:sticky; top:72px;
+    }
+    pre.output{
+      white-space:pre-wrap;
+      word-break:break-word;
+      background:#0b1220;
+      color:#e2e8f0;
+      border-radius:14px;
+      border:1px solid #111827;
+      padding:12px;
+      min-height:240px;
+      font-size:12px;
+      line-height:1.55;
+    }
+    .switch{
+      display:flex; align-items:center; gap:8px; user-select:none;
+      border:1px solid var(--bd); background:var(--bg);
+      border-radius:999px; padding:6px 10px;
+      font-size:12px; color:var(--mut);
+    }
+    .switch input{ width:18px; height:18px; }
+    .hint{
+      background:var(--bg);
+      border:1px dashed var(--bd);
+      border-radius:14px;
+      padding:10px;
+      font-size:12px;
+      color:var(--mut);
+    }
+    .careItem{
+      border:1px dashed var(--bd);
+      border-radius:14px;
+      padding:10px;
+      background:var(--bg);
+      display:flex; flex-direction:column; gap:8px;
+    }
+    .careHead{
+      display:flex; align-items:center; justify-content:space-between; gap:8px;
+    }
+    .careHead strong{ font-size:13px; }
+    .careBtns{ display:flex; gap:8px; flex-wrap:wrap; }
+    .inline{
+      display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+    }
+    .search{
+      display:flex; gap:8px; align-items:center;
+    }
+    .search input{ width:100%; }
+    .hidden{ display:none !important; }
+  </style>
+</head>
+<body>
+<header>
+  <div class="head">
+    <div class="title">
+      <h1>発達所見メーカー（場面×選択式）</h1>
+      <p>場面→チップ選択→所見＆配慮事項を自動生成（端末内自動保存）</p>
+    </div>
+    <div class="topActions">
+      <label class="switch" title="表現をやわらかくします">
+        <input id="softTone" type="checkbox" />
+        <span>やわらか表現</span>
+      </label>
+      <button class="ghost" id="btnCopy">コピー</button>
+      <button class="ghost" id="btnDownload">txt保存</button>
+      <button class="danger" id="btnReset">リセット</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="grid">
+    <!-- LEFT: Inputs -->
+    <div class="card">
+      <h2>入力</h2>
+
+      <div class="tabs" id="tabs"></div>
+
+      <!-- STEP 1 -->
+      <div id="step1">
+        <div class="row cols3">
+          <div>
+            <label>児童名（任意）</label>
+            <input id="childName" placeholder="例：〇〇 〇〇" />
+          </div>
+          <div>
+            <label>年齢 / 学年（任意）</label>
+            <input id="age" placeholder="例：5歳 / 年長" />
+          </div>
+          <div>
+            <label>記録日</label>
+            <input id="date" type="date" />
+          </div>
+        </div>
+
+        <div class="row cols2" style="margin-top:8px;">
+          <div>
+            <label>提出種別（任意）</label>
+            <input id="docType" placeholder="例：保育要録（小学校接続） / 発達記録" />
+          </div>
+          <div>
+            <label>作成者（任意）</label>
+            <input id="author" placeholder="例：担任 / 支援員" />
+          </div>
+        </div>
+
+        <div class="row cols2" style="margin-top:8px;">
+          <div>
+            <label>場面（まず選ぶ）</label>
+            <select id="scene"></select>
+            <div class="muted" style="margin-top:6px;">※場面により、表示される選択肢が絞られます。</div>
+          </div>
+          <div>
+            <label>検索（選択肢を絞り込み）</label>
+            <div class="search">
+              <input id="search" placeholder="例：ルール / 切り替え / 口調 / 順番 など" />
+            </div>
+            <div class="muted" style="margin-top:6px;">※チップ内の文言を検索できます。</div>
+          </div>
+        </div>
+
+        <hr class="hr" />
+
+        <div class="hint">
+          <div><strong>入力のコツ</strong></div>
+          <ul style="margin:6px 0 0 18px; padding:0;">
+            <li>まず「場面」を選ぶ → その場面で見えた強み/課題/支援をポチポチ</li>
+            <li>所見は <span class="pill">強み → 課題（頻度/程度） → 支援/目標</span> の順で自動生成</li>
+            <li>最後に配慮事項は自動で作られるが、必要なら手入力で追記OK</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div id="step2" class="hidden">
+        <div class="sectionTitle">
+          <h3>領域ごとに選択（チップ）</h3>
+          <div class="toolsLine">
+            <button class="mini ghost" id="btnExpandAll" type="button">全部開く</button>
+            <button class="mini ghost" id="btnCollapseAll" type="button">全部閉じる</button>
+            <button class="mini ghost" id="btnClearAll" type="button">全解除</button>
+          </div>
+        </div>
+
+        <div id="domains" class="row" style="gap:10px;"></div>
+
+        <hr class="hr" />
+        <div class="row cols2">
+          <div>
+            <label>自由メモ（任意：そのまま概要欄に入ります）</label>
+            <textarea id="rawMemo" placeholder="例：ルール理解はあるが、相手に伝えたい気持ちが強く強い口調になってしまう。"></textarea>
+          </div>
+          <div>
+            <label>生成文の微調整メモ（任意：最後に追記）</label>
+            <textarea id="appendMemo" placeholder="例：園内では順番カードが有効。家庭と連携し同様の言い換えを共有する。"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div id="step3" class="hidden">
+        <div class="sectionTitle">
+          <h3>配慮事項（自動生成＋手入力追加）</h3>
+          <div class="toolsLine">
+            <button class="mini primary" id="btnAutoCare" type="button">配慮事項を自動作成</button>
+            <button class="mini ghost" id="btnAddCare" type="button">手入力で追加</button>
+            <button class="mini ghost" id="btnGenerate" type="button">全文を再生成</button>
+          </div>
+        </div>
+
+        <div id="careList" style="display:flex; flex-direction:column; gap:10px;"></div>
+
+        <div class="muted" style="margin-top:10px;">
+          ※配慮事項は「できている点を認める → 困りごと → 次の支援/目標」の順が読みやすいです。
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: Preview -->
+    <div class="card sticky">
+      <h2>プレビュー（リアルタイム）</h2>
+      <div class="muted" style="margin-bottom:8px;">
+        生成結果を確認しつつ、左の選択肢を調整して完成度を上げてください。
+      </div>
+      <pre id="out" class="output">ここに生成結果が表示されます。</pre>
+      <div class="toolsLine" style="margin-top:10px;">
+        <button class="primary" id="btnGenerate2">全文を生成</button>
+        <button class="ghost" id="btnExample">例を一括入力</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/** =========================
+ *  データ定義（ここを増やせばテンプレが増える）
+ *  ========================= */
+
+const DOMAINS = [
+  { id:"A", title:"（A）認知・理解" },
+  { id:"B", title:"（B）言語・表現" },
+  { id:"C", title:"（C）社会性・対人" },
+  { id:"D", title:"（D）情緒・自己調整" },
+  { id:"E", title:"（E）運動（粗大/微細）" },
+  { id:"F", title:"（F）生活（身辺自立・集団生活）" },
+];
+
+const SCENES = [
+  { id:"free", label:"自由遊び" },
+  { id:"group", label:"集団活動（朝の会/設定保育）" },
+  { id:"shift", label:"移動/切り替え（次の活動へ）" },
+  { id:"meal", label:"食事" },
+  { id:"toilet", label:"排泄" },
+  { id:"desk", label:"製作/机上活動" },
+  { id:"yard", label:"園庭/運動遊び" },
+  { id:"trouble", label:"対人トラブル時" },
+  { id:"home", label:"家庭との連携（共有事項）" },
+];
+
+// type: strength / challenge / support
+// scenes: 表示対象の場面（省略＝全場面）
+// phrase: 生成文に入るフレーズ（soft:やわらか版）
+const ITEMS = [
+  // ---- A 認知・理解 ----
+  { id:"A_s_rule", domain:"A", type:"strength", label:"ルール理解・順番が概ね可能",
+    phrase:{ default:"ルール理解や状況把握は概ね可能で、順番や約束を意識して行動できる場面が増えている。", soft:"ルール理解や状況把握は概ね可能で、順番や約束を意識して行動できる場面が増えている。" } },
+  { id:"A_s_pros", domain:"A", type:"strength", label:"見通しがあると安定",
+    phrase:{ default:"活動の見通しが持てると落ち着いて取り組みやすい。", soft:"活動の見通しが持てると落ち着いて取り組みやすい。" } },
+  { id:"A_s_step", domain:"A", type:"strength", label:"手順理解・段取りが分かる",
+    phrase:{ default:"活動の手順を理解し、段取りを意識して進められる。", soft:"活動の手順を理解し、段取りを意識して進められる。" }, scenes:["desk","group"] },
+  { id:"A_s_focus", domain:"A", type:"strength", label:"集中して取り組める場面がある",
+    phrase:{ default:"興味のある内容では集中して取り組める。", soft:"興味のある内容では集中して取り組める。" } },
+  { id:"A_c_change", domain:"A", type:"challenge", label:"変更・初めての活動で混乱しやすい",
+    phrase:{ default:"予定の変更や初めての活動では、理解に時間を要する場面がある。", soft:"予定の変更や初めての活動では、理解に時間を要する場面がある。" } },
+  { id:"A_c_multi", domain:"A", type:"challenge", label:"指示が複数あると抜けやすい",
+    phrase:{ default:"指示が複数あると、取りこぼしが生じやすい。", soft:"指示が複数あると、取りこぼしが生じやすい。" } },
+  { id:"A_c_shift", domain:"A", type:"challenge", label:"切り替えに時間がかかることがある",
+    phrase:{ default:"活動の切り替えに時間がかかる場面がある。", soft:"活動の切り替えに時間がかかる場面がある。" }, scenes:["shift","group"] },
+  { id:"A_c_attention", domain:"A", type:"challenge", label:"注意が逸れやすい",
+    phrase:{ default:"周囲の刺激で注意が逸れやすい場面がある。", soft:"周囲の刺激で注意が逸れやすい場面がある。" } },
+  { id:"A_p_visual", domain:"A", type:"support", label:"視覚的提示（順番表/絵カード）",
+    phrase:{ default:"順番表や絵カードなど視覚的提示を用いると、理解と見通しが整い安定しやすい。", soft:"順番表や絵カードなど視覚的提示を用いると、理解と見通しが整い安定しやすい。" } },
+  { id:"A_p_one", domain:"A", type:"support", label:"一点指示＋確認",
+    phrase:{ default:"指示は短く一点に絞り、復唱や確認を挟むと取り組みが進みやすい。", soft:"指示は短く一点に絞り、確認を挟むと取り組みが進みやすい。" } },
+  { id:"A_p_pre", domain:"A", type:"support", label:"事前予告（次→次）",
+    phrase:{ default:"切り替え前に『次に何をするか』を事前に予告すると移行がスムーズになりやすい。", soft:"切り替え前に『次に何をするか』を事前に予告すると移行がスムーズになりやすい。" }, scenes:["shift","group"] },
+
+  // ---- B 言語・表現 ----
+  { id:"B_s_will", domain:"B", type:"strength", label:"伝えたい意欲が高い",
+    phrase:{ default:"自分の考えを言葉で伝えようとする意欲が高い。", soft:"自分の考えを言葉で伝えようとする意欲が高い。" } },
+  { id:"B_s_vocab", domain:"B", type:"strength", label:"説明・語彙が豊か（場面あり）",
+    phrase:{ default:"状況を説明したり気づきを言語化したりする力が育っている。", soft:"状況を説明したり気づきを言語化したりする力が育っている。" } },
+  { id:"B_s_ask", domain:"B", type:"strength", label:"質問・確認ができる",
+    phrase:{ default:"分からないことを質問したり確認したりして理解を深めようとする。", soft:"分からないことを質問したり確認したりして理解を深めようとする。" } },
+  { id:"B_c_tone", domain:"B", type:"challenge", label:"気持ちが高まると語気が強い",
+    phrase:{ default:"気持ちが高まる場面では語気が強くなりやすい。", soft:"気持ちが高まる場面では言葉が強く聞こえることがある。" }, scenes:["trouble","group","free"] },
+  { id:"B_c_rephrase", domain:"B", type:"challenge", label:"言い換えが難しい場面がある",
+    phrase:{ default:"相手に合わせた言い換えが難しい場面がある。", soft:"相手に合わせた言い換えが難しい場面がある。" } },
+  { id:"B_c_listen", domain:"B", type:"challenge", label:"相手の話を最後まで聞くのが難しい",
+    phrase:{ default:"相手の話を最後まで聞く前に自分の主張を伝えたくなる場面がある。", soft:"相手の話を最後まで聞く前に、自分の考えを伝えたくなる場面がある。" }, scenes:["trouble","group"] },
+  { id:"B_p_phrase", domain:"B", type:"support", label:"『やさしい言い方』例文を共有",
+    phrase:{ default:"『やさしい言い方』の例文を一緒に考え、場面で使えるように練習すると良い。", soft:"『やさしい言い方』の例文を一緒に考え、場面で使えるように練習すると良い。" } },
+  { id:"B_p_exit", domain:"B", type:"support", label:"困ったら先生に伝える逃げ道",
+    phrase:{ default:"気持ちが高まるときは、いったん先生に伝えるなど代替行動を用意すると安定しやすい。", soft:"気持ちが高まるときは、いったん先生に伝えるなど代替行動を用意すると安心につながりやすい。" }, scenes:["trouble","group"] },
+  { id:"B_p_wait", domain:"B", type:"support", label:"『3秒待つ/一呼吸』の合図",
+    phrase:{ default:"『一呼吸する』『3秒待つ』などの合図を共有すると、言葉選びが整いやすい。", soft:"『一呼吸する』『3秒待つ』などの合図を共有すると、言葉選びが整いやすい。" } },
+
+  // ---- C 社会性・対人 ----
+  { id:"C_s_join", domain:"C", type:"strength", label:"友だちと関わろうとする",
+    phrase:{ default:"友だちとの関わりを持とうとする姿が見られる。", soft:"友だちとの関わりを持とうとする姿が見られる。" } },
+  { id:"C_s_turn", domain:"C", type:"strength", label:"順番・交代を意識できる",
+    phrase:{ default:"順番や交代を意識して参加できる場面が増えている。", soft:"順番や交代を意識して参加できる場面が増えている。" }, scenes:["group","free","yard"] },
+  { id:"C_s_help", domain:"C", type:"strength", label:"手伝い・役割に取り組める",
+    phrase:{ default:"役割を持つと意欲的に取り組める。", soft:"役割を持つと意欲的に取り組める。" }, scenes:["group","home"] },
+  { id:"C_c_strong", domain:"C", type:"challenge", label:"相手へ伝える口調が強くなることがある",
+    phrase:{ default:"相手に伝えたい気持ちが強い場面では、口調が強くなることがある。", soft:"相手に伝えたい気持ちが強い場面では、言葉が強く聞こえることがある。" }, scenes:["trouble","group","free"] },
+  { id:"C_c_point", domain:"C", type:"challenge", label:"ルール違反を強く指摘しやすい",
+    phrase:{ default:"ルール違反に気づくと、強く指摘したくなる場面がある。", soft:"ルール違反に気づくと、指摘が強くなりやすい場面がある。" }, scenes:["trouble","group","free"] },
+  { id:"C_c_lose", domain:"C", type:"challenge", label:"負け/失敗が続くと崩れやすい",
+    phrase:{ default:"負けや失敗が続くと気持ちが崩れやすい場面がある。", soft:"負けや失敗が続くと気持ちが揺れやすい場面がある。" }, scenes:["yard","group","free"] },
+  { id:"C_p_words", domain:"C", type:"support", label:"定型フレーズ（やめて/順番だよ/先生呼ぶ）",
+    phrase:{ default:"トラブル時の定型フレーズ（『やめて』『順番だよ』『先生呼ぶね』等）を共有すると、やりとりが整いやすい。", soft:"トラブル時の定型フレーズ（『やめて』『順番だよ』『先生呼ぶね』等）を共有すると、やりとりが整いやすい。" }, scenes:["trouble","group","free"] },
+  { id:"C_p_role", domain:"C", type:"support", label:"役割分担を明確にする",
+    phrase:{ default:"役割分担を明確にすると、安心して参加しやすい。", soft:"役割分担を明確にすると、安心して参加しやすい。" }, scenes:["group","yard"] },
+  { id:"C_p_praise", domain:"C", type:"support", label:"成功体験を具体的に言語化して返す",
+    phrase:{ default:"うまくいった場面を具体的に言語化して返すことで、望ましい関わりが増えやすい。", soft:"うまくいった場面を具体的に言語化して返すことで、望ましい関わりが増えやすい。" } },
+
+  // ---- D 情緒・自己調整 ----
+  { id:"D_s_recover", domain:"D", type:"strength", label:"落ち着くまでの時間が短くなっている",
+    phrase:{ default:"気持ちが高まっても、落ち着くまでの時間が短くなってきている。", soft:"気持ちが高まっても、落ち着くまでの時間が短くなってきている。" } },
+  { id:"D_s_signal", domain:"D", type:"strength", label:"合図で切り替えやすい",
+    phrase:{ default:"合図や見通し提示があると自己調整しやすい。", soft:"合図や見通し提示があると自己調整しやすい。" } },
+  { id:"D_c_escalate", domain:"D", type:"challenge", label:"納得できないと高まりやすい",
+    phrase:{ default:"納得できない場面では感情が高まりやすい。", soft:"納得できない場面では気持ちが高まりやすい。" } },
+  { id:"D_c_wait", domain:"D", type:"challenge", label:"待つ場面で不安定になりやすい",
+    phrase:{ default:"待つ場面で落ち着きにくくなることがある。", soft:"待つ場面で落ち着きにくくなることがある。" }, scenes:["shift","group","meal"] },
+  { id:"D_c_sens", domain:"D", type:"challenge", label:"刺激（音/人の多さ）で疲れやすい",
+    phrase:{ default:"周囲の刺激（音や人の多さ等）で疲れが出やすい場面がある。", soft:"周囲の刺激（音や人の多さ等）で疲れが出やすい場面がある。" } },
+  { id:"D_p_cool", domain:"D", type:"support", label:"クールダウン手順（場所/合図/時間）を固定",
+    phrase:{ default:"クールダウンの手順（場所・合図・時間）を共有し固定すると安定しやすい。", soft:"クールダウンの手順（場所・合図・時間）を共有し固定すると安定しやすい。" } },
+  { id:"D_p_next", domain:"D", type:"support", label:"落ち着いたら何をするか先に提示",
+    phrase:{ default:"落ち着いた後の行動（次に何をするか）を先に提示すると見通しが持てる。", soft:"落ち着いた後の行動（次に何をするか）を先に提示すると見通しが持てる。" } },
+  { id:"D_p_reflect", domain:"D", type:"support", label:"できた時の振り返り（成功の言語化）",
+    phrase:{ default:"落ち着けた場面を振り返り、成功を言語化することで再現性が高まりやすい。", soft:"落ち着けた場面を振り返り、成功を言語化することで再現性が高まりやすい。" } },
+
+  // ---- E 運動 ----
+  { id:"E_s_ok", domain:"E", type:"strength", label:"活動参加に大きな支障なし",
+    phrase:{ default:"活動参加に大きな支障は見られない。", soft:"活動参加に大きな支障は見られない。" } },
+  { id:"E_s_balance", domain:"E", type:"strength", label:"粗大運動（走る/跳ぶ/バランス）",
+    phrase:{ default:"走る・跳ぶ・バランスなど粗大運動は概ね年齢相応に取り組める。", soft:"走る・跳ぶ・バランスなど粗大運動は概ね年齢相応に取り組める。" }, scenes:["yard"] },
+  { id:"E_s_fine", domain:"E", type:"strength", label:"微細（はさみ/鉛筆）に取り組める",
+    phrase:{ default:"はさみ・鉛筆等の微細動作に取り組む意欲がある。", soft:"はさみ・鉛筆等の微細動作に取り組む意欲がある。" }, scenes:["desk"] },
+  { id:"E_c_posture", domain:"E", type:"challenge", label:"姿勢保持が崩れやすい",
+    phrase:{ default:"机上活動で姿勢保持が崩れやすい場面がある。", soft:"机上活動で姿勢保持が崩れやすい場面がある。" }, scenes:["desk"] },
+  { id:"E_c_pressure", domain:"E", type:"challenge", label:"筆圧/力加減が難しい",
+    phrase:{ default:"筆圧や力加減の調整が難しい場面がある。", soft:"筆圧や力加減の調整が難しい場面がある。" }, scenes:["desk"] },
+  { id:"E_c_coord", domain:"E", type:"challenge", label:"協調運動（集団で動きを合わせる）が難しい",
+    phrase:{ default:"集団で動きを合わせる協調運動が難しい場面がある。", soft:"集団で動きを合わせる協調運動が難しい場面がある。" }, scenes:["yard","group"] },
+  { id:"E_p_tool", domain:"E", type:"support", label:"道具の工夫（太軸/滑り止め等）",
+    phrase:{ default:"道具の工夫（太軸・滑り止め等）で成功体験を増やすと良い。", soft:"道具の工夫（太軸・滑り止め等）で成功体験を増やすと良い。" }, scenes:["desk"] },
+  { id:"E_p_amount", domain:"E", type:"support", label:"分量調整（量より成功）",
+    phrase:{ default:"課題量を調整し、できた実感を積み重ねると取り組みが安定しやすい。", soft:"課題量を調整し、できた実感を積み重ねると取り組みが安定しやすい。" } },
+  { id:"E_p_break", domain:"E", type:"support", label:"休憩タイミングの明確化",
+    phrase:{ default:"疲れが出る前に休憩タイミングを明確にすると集中が続きやすい。", soft:"疲れが出る前に休憩タイミングを明確にすると集中が続きやすい。" } },
+
+  // ---- F 生活 ----
+  { id:"F_s_ready", domain:"F", type:"strength", label:"身支度・片付けができる場面がある",
+    phrase:{ default:"身支度や片付けは、見通しや合図があると取り組める場面が増えている。", soft:"身支度や片付けは、見通しや合図があると取り組める場面が増えている。" } },
+  { id:"F_s_toilet", domain:"F", type:"strength", label:"排泄は概ね自立（必要なら調整）",
+    phrase:{ default:"排泄は概ね自立している。", soft:"排泄は概ね自立している。" }, scenes:["toilet"] },
+  { id:"F_s_meal", domain:"F", type:"strength", label:"食事は概ね安定",
+    phrase:{ default:"食事場面は概ね安定している。", soft:"食事場面は概ね安定している。" }, scenes:["meal"] },
+  { id:"F_c_prompt", domain:"F", type:"challenge", label:"促しがないと後回しになりやすい",
+    phrase:{ default:"促しがないと、身支度や片付けが後回しになりやすい場面がある。", soft:"促しがないと、身支度や片付けが後回しになりやすい場面がある。" } },
+  { id:"F_c_time", domain:"F", type:"challenge", label:"時間の見通しが難しい",
+    phrase:{ default:"時間の見通しが持ちにくく、切り替えに時間がかかる場面がある。", soft:"時間の見通しが持ちにくく、切り替えに時間がかかる場面がある。" }, scenes:["shift","group","meal"] },
+  { id:"F_c_sens", domain:"F", type:"challenge", label:"混雑/音で疲れて生活場面が乱れやすい",
+    phrase:{ default:"混雑や音の刺激で疲れが出ると、生活場面の取り組みが乱れやすい。", soft:"混雑や音の刺激で疲れが出ると、生活場面の取り組みが不安定になりやすい。" } },
+  { id:"F_p_routine", domain:"F", type:"support", label:"ルーティン表（手順を見える化）",
+    phrase:{ default:"ルーティン表で手順を見える化すると、自立的に進めやすい。", soft:"ルーティン表で手順を見える化すると、自立的に進めやすい。" } },
+  { id:"F_p_model", domain:"F", type:"support", label:"見本提示（どこまでやるかを明確に）",
+    phrase:{ default:"『どこまでやれば完了か』を見本で示すと、片付け等が進みやすい。", soft:"『どこまでやれば完了か』を見本で示すと、片付け等が進みやすい。" } },
+  { id:"F_p_praise", domain:"F", type:"support", label:"できた所を具体的にフィードバック",
+    phrase:{ default:"できた所を具体的に伝えることで、望ましい行動が定着しやすい。", soft:"できた所を具体的に伝えることで、望ましい行動が定着しやすい。" } },
+];
+
+// 目標（短期）生成の簡易ルール（最初にマッチしたものを採用）
+const GOAL_RULES = [
+  { matchIds:["C_c_strong","B_c_tone","B_c_rephrase","C_c_point"], goal:"友だちへの伝え方（やさしい言い方・言い換え・間の取り方）を一緒に考え、場面で使える回数を増やす。" },
+  { matchIds:["A_c_shift","F_c_time","A_c_change"], goal:"見通し提示（次→次）や事前予告を活用し、切り替えを安定して行える場面を増やす。" },
+  { matchIds:["D_c_escalate","D_c_wait"], goal:"クールダウン手順を共有し、気持ちが高まった際に自分で落ち着くまでの流れを身につける。" },
+  { matchIds:["E_c_posture","E_c_pressure"], goal:"道具や姿勢の工夫で成功体験を積み、机上活動の安定した参加時間を増やす。" },
+  { matchIds:["C_c_lose"], goal:"勝敗や失敗があっても続けられる声かけや役割設定を行い、参加の継続を支える。" },
+];
+
+// 文章のトーン調整（やわらか表現ON時）
+function softenText(text){
+  const reps = [
+    ["できない","難しい"],
+    ["問題","課題"],
+    ["崩れ","揺れ"],
+    ["強い","やや強い"],
+    ["不安定","揺れがみられる"],
+    ["指摘","伝え"],
+  ];
+  let t = text;
+  for (const [a,b] of reps) t = t.replaceAll(a,b);
+  return t;
+}
+
+/** =========================
+ *  状態管理
+ *  ========================= */
+const STORAGE_KEY = "dev_wizard_app_v2";
+const state = {
+  step: 1,
+  softTone: false,
+  info: { childName:"", age:"", date:"", docType:"", author:"", scene:"free", search:"" },
+  // selections[domain] = { strength:Set, challenge:Set, support:Set, freq:"ときどき", severity:"軽度", need:"声かけで可", note:"" }
+  selections: {},
+  memo: { rawMemo:"", appendMemo:"" },
+  cares: [], // manual care items
+};
+
+const DEFAULT_DOMAIN_META = { freq:"ときどき", severity:"軽度", need:"声かけで可", note:"" };
+const FREQS = ["まれ","ときどき","よく"];
+const SEVERITIES = ["軽度","中等度","強い"];
+const NEEDS = ["なし","声かけで可","個別対応が必要"];
+
+/** =========================
+ *  UI 初期化
+ *  ========================= */
+const $ = (id) => document.getElementById(id);
+
+function nowISO(){
+  const d = new Date();
+  const off = d.getTimezoneOffset();
+  const local = new Date(d.getTime() - off*60*1000);
+  return local.toISOString().slice(0,10);
+}
+
+function initState(){
+  for (const d of DOMAINS){
+    state.selections[d.id] = {
+      strength: new Set(),
+      challenge: new Set(),
+      support: new Set(),
+      ...DEFAULT_DOMAIN_META,
+    };
+  }
+  state.info.date = nowISO();
+}
+
+function loadDraft(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return false;
+    const s = JSON.parse(raw);
+
+    state.step = s.step ?? 1;
+    state.softTone = !!s.softTone;
+    state.info = { ...state.info, ...(s.info || {}) };
+    state.memo = { ...state.memo, ...(s.memo || {}) };
+    state.cares = Array.isArray(s.cares) ? s.cares : [];
+
+    if(s.selections){
+      for(const d of DOMAINS){
+        const src = s.selections[d.id];
+        if(!src) continue;
+        state.selections[d.id] = {
+          strength: new Set(src.strength || []),
+          challenge: new Set(src.challenge || []),
+          support: new Set(src.support || []),
+          freq: src.freq || DEFAULT_DOMAIN_META.freq,
+          severity: src.severity || DEFAULT_DOMAIN_META.severity,
+          need: src.need || DEFAULT_DOMAIN_META.need,
+          note: src.note || "",
+        };
+      }
+    }
+    return true;
+  }catch(e){
+    console.warn(e);
+    return false;
+  }
+}
+
+function saveDraft(){
+  const payload = {
+    step: state.step,
+    softTone: state.softTone,
+    info: state.info,
+    memo: state.memo,
+    cares: state.cares,
+    selections: {},
+  };
+  for(const d of DOMAINS){
+    const x = state.selections[d.id];
+    payload.selections[d.id] = {
+      strength: [...x.strength],
+      challenge: [...x.challenge],
+      support: [...x.support],
+      freq: x.freq, severity: x.severity, need: x.need, note: x.note,
+    };
+  }
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+}
+
+/** =========================
+ *  レンダリング
+ *  ========================= */
+function renderTabs(){
+  const tabs = [
+    { id:1, label:"1) 基本/場面" },
+    { id:2, label:"2) 領域選択" },
+    { id:3, label:"3) 配慮事項" },
+  ];
+  const box = $("tabs");
+  box.innerHTML = "";
+  for(const t of tabs){
+    const el = document.createElement("div");
+    el.className = "tab" + (state.step === t.id ? " on":"");
+    el.textContent = t.label;
+    el.addEventListener("click", () => { setStep(t.id); });
+    box.appendChild(el);
+  }
+}
+
+function setStep(n){
+  state.step = n;
+  $("step1").classList.toggle("hidden", n !== 1);
+  $("step2").classList.toggle("hidden", n !== 2);
+  $("step3").classList.toggle("hidden", n !== 3);
+  renderTabs();
+  saveDraft();
+}
+
+function renderScenes(){
+  const sel = $("scene");
+  sel.innerHTML = "";
+  for(const s of SCENES){
+    const opt = document.createElement("option");
+    opt.value = s.id;
+    opt.textContent = s.label;
+    sel.appendChild(opt);
+  }
+  sel.value = state.info.scene;
+}
+
+function sceneLabel(sceneId){
+  const s = SCENES.find(x=>x.id===sceneId);
+  return s ? s.label : "";
+}
+
+function itemVisibleInScene(item, sceneId){
+  if(!item.scenes) return true;
+  return item.scenes.includes(sceneId);
+}
+
+function matchesSearch(item, q){
+  if(!q) return true;
+  const t = (item.label + " " + (item.phrase?.default || "")).toLowerCase();
+  return t.includes(q.toLowerCase());
+}
+
+function countSelected(domainId){
+  const x = state.selections[domainId];
+  return x.strength.size + x.challenge.size + x.support.size;
+}
+
+function renderDomains(){
+  const root = $("domains");
+  root.innerHTML = "";
+
+  for(const d of DOMAINS){
+    const details = document.createElement("details");
+    details.open = (d.id === "A" || d.id === "B" || d.id === "C"); // 初期は上3つだけ開く
+    details.dataset.domain = d.id;
+
+    const summary = document.createElement("summary");
+    const left = document.createElement("div");
+    left.className = "domainBadge";
+    left.innerHTML = `<span>${d.title}</span> <span class="count">選択 ${countSelected(d.id)}</span>`;
+    summary.appendChild(left);
+
+    const right = document.createElement("div");
+    right.className = "muted";
+    right.textContent = "開く/閉じる";
+    summary.appendChild(right);
+
+    details.appendChild(summary);
+
+    const body = document.createElement("div");
+    body.style.marginTop = "10px";
+
+    const meta = renderDomainMeta(d.id);
+    body.appendChild(meta);
+
+    body.appendChild(renderChipSection(d.id, "strength", "強み（できている点）"));
+    body.appendChild(renderChipSection(d.id, "challenge", "課題（つまずき）"));
+    body.appendChild(renderChipSection(d.id, "support", "支援（有効な手立て）"));
+
+    const noteWrap = document.createElement("div");
+    noteWrap.style.marginTop = "10px";
+    noteWrap.innerHTML = `
+      <label>この領域の追加メモ（任意）</label>
+      <textarea data-note="${d.id}" placeholder="例：強い口調は『伝えたい気持ちが強い』背景があるため、言い換えを一緒に作る。">${escapeHtml(state.selections[d.id].note || "")}</textarea>
+    `;
+    body.appendChild(noteWrap);
+
+    details.appendChild(body);
+    root.appendChild(details);
+  }
+
+  // bind note change
+  root.querySelectorAll("textarea[data-note]").forEach(el=>{
+    el.addEventListener("input", () => {
+      const domainId = el.getAttribute("data-note");
+      state.selections[domainId].note = el.value;
+      saveDraft();
+      generateAndRender();
+    });
+  });
+}
+
+function renderDomainMeta(domainId){
+  const x = state.selections[domainId];
+  const wrap = document.createElement("div");
+  wrap.className = "row cols3";
+  wrap.style.marginBottom = "10px";
+  wrap.innerHTML = `
+    <div>
+      <label>課題の頻度</label>
+      <select data-meta="${domainId}" data-key="freq">${FREQS.map(v=>`<option ${v===x.freq?"selected":""}>${v}</option>`).join("")}</select>
+    </div>
+    <div>
+      <label>課題の程度</label>
+      <select data-meta="${domainId}" data-key="severity">${SEVERITIES.map(v=>`<option ${v===x.severity?"selected":""}>${v}</option>`).join("")}</select>
+    </div>
+    <div>
+      <label>支援の必要度</label>
+      <select data-meta="${domainId}" data-key="need">${NEEDS.map(v=>`<option ${v===x.need?"selected":""}>${v}</option>`).join("")}</select>
+    </div>
+  `;
+  // bind after attached
+  setTimeout(()=>{
+    wrap.querySelectorAll("select[data-meta]").forEach(sel=>{
+      sel.addEventListener("change", ()=>{
+        const d = sel.getAttribute("data-meta");
+        const key = sel.getAttribute("data-key");
+        state.selections[d][key] = sel.value;
+        saveDraft();
+        generateAndRender();
+        renderDomainCounts();
+      });
+    });
+  }, 0);
+
+  return wrap;
+}
+
+function renderChipSection(domainId, type, title){
+  const sceneId = state.info.scene;
+  const q = state.info.search;
+
+  const selected = state.selections[domainId][type]; // Set
+  const items = ITEMS
+    .filter(it => it.domain === domainId && it.type === type)
+    .filter(it => itemVisibleInScene(it, sceneId))
+    .filter(it => matchesSearch(it, q));
+
+  const wrap = document.createElement("div");
+  wrap.style.marginBottom = "10px";
+
+  const head = document.createElement("div");
+  head.className = "sectionTitle";
+  head.innerHTML = `
+    <h3>${title} <span class="pill">${items.length}件表示</span></h3>
+    <div class="toolsLine">
+      <button class="mini ghost" type="button" data-act="all" data-domain="${domainId}" data-type="${type}">全部選択</button>
+      <button class="mini ghost" type="button" data-act="none" data-domain="${domainId}" data-type="${type}">解除</button>
+    </div>
+  `;
+  wrap.appendChild(head);
+
+  const chips = document.createElement("div");
+  chips.className = "chips";
+
+  if(items.length === 0){
+    const empty = document.createElement("div");
+    empty.className = "muted";
+    empty.textContent = "該当する項目がありません（場面/検索条件を変更してください）";
+    wrap.appendChild(empty);
+  }else{
+    for(const it of items){
+      const chip = document.createElement("div");
+      chip.className = "chip" + (selected.has(it.id) ? " on":"");
+      chip.dataset.itemId = it.id;
+      chip.dataset.domain = domainId;
+      chip.dataset.type = type;
+      chip.innerHTML = `<div>${escapeHtml(it.label)}</div>`;
+      chip.addEventListener("click", () => toggleItem(domainId, type, it.id));
+      chips.appendChild(chip);
+    }
+    wrap.appendChild(chips);
+  }
+
+  // bind section buttons
+  setTimeout(()=>{
+    head.querySelectorAll("button[data-act]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const act = btn.getAttribute("data-act");
+        const d = btn.getAttribute("data-domain");
+        const t = btn.getAttribute("data-type");
+        batchSelect(d, t, act, sceneId, q);
+      });
+    });
+  },0);
+
+  return wrap;
+}
+
+function renderDomainCounts(){
+  document.querySelectorAll('details[data-domain]').forEach(det=>{
+    const domainId = det.getAttribute("data-domain");
+    const badge = det.querySelector(".count");
+    if(badge) badge.textContent = `選択 ${countSelected(domainId)}`;
+  });
+}
+
+function escapeHtml(str){
+  return (str ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;");
+}
+
+/** =========================
+ *  選択操作
+ *  ========================= */
+function toggleItem(domainId, type, itemId){
+  const set = state.selections[domainId][type];
+  if(set.has(itemId)) set.delete(itemId);
+  else set.add(itemId);
+
+  saveDraft();
+  // 画面更新（軽くするためにチップだけ更新でも良いが、ここは確実性優先）
+  renderDomains();
+  generateAndRender();
+  renderDomainCounts();
+}
+
+function batchSelect(domainId, type, act, sceneId, q){
+  const set = state.selections[domainId][type];
+  const visibleIds = ITEMS
+    .filter(it => it.domain===domainId && it.type===type)
+    .filter(it => itemVisibleInScene(it, sceneId))
+    .filter(it => matchesSearch(it, q))
+    .map(it => it.id);
+
+  if(act === "all"){
+    visibleIds.forEach(id=>set.add(id));
+  }else{
+    visibleIds.forEach(id=>set.delete(id));
+  }
+  saveDraft();
+  renderDomains();
+  generateAndRender();
+  renderDomainCounts();
+}
+
+function clearAllSelections(){
+  for(const d of DOMAINS){
+    state.selections[d.id].strength.clear();
+    state.selections[d.id].challenge.clear();
+    state.selections[d.id].support.clear();
+    state.selections[d.id].note = "";
+    state.selections[d.id].freq = DEFAULT_DOMAIN_META.freq;
+    state.selections[d.id].severity = DEFAULT_DOMAIN_META.severity;
+    state.selections[d.id].need = DEFAULT_DOMAIN_META.need;
+  }
+  state.memo.rawMemo = "";
+  state.memo.appendMemo = "";
+  state.cares = [];
+  saveDraft();
+  renderDomains();
+  renderCareList();
+  generateAndRender();
+  renderDomainCounts();
+}
+
+/** =========================
+ *  配慮事項（自動＆手入力）
+ *  ========================= */
+function autoGenerateCares(){
+  const cares = [];
+  const sceneText = sceneLabel(state.info.scene);
+
+  for(const d of DOMAINS){
+    const x = state.selections[d.id];
+    if(x.challenge.size === 0) continue;
+
+    const challenges = [...x.challenge].map(id=>getPhrase(id)).filter(Boolean);
+    const strengths = [...x.strength].map(id=>getPhrase(id)).filter(Boolean);
+    const supports = [...x.support].map(id=>getPhrase(id)).filter(Boolean);
+
+    const title = `${d.title}：配慮`;
+    const issue = `【場面】${sceneText}\n【課題】${x.freq}（${x.severity}）の頻度・程度で、${compactJoin(challenges, 2)}`;
+    const basis = strengths.length ? `【できている点】${compactJoin(strengths, 2)}` : `【できている点】（必要に応じて追記）`;
+    const support = supports.length
+      ? `【支援】${compactJoin(supports, 2)}\n【支援必要度】${x.need}`
+      : `【支援】見通し提示・声かけ・言い換え支援など、場面に応じて調整。\n【支援必要度】${x.need}`;
+
+    cares.push({ title, issue, basis, support });
+  }
+
+  // 既存を上書きせず、先頭に追加
+  state.cares = [...cares, ...state.cares];
+  saveDraft();
+  renderCareList();
+  generateAndRender();
+}
+
+function addManualCareItem(){
+  state.cares.unshift({
+    title:"配慮事項（手入力）",
+    issue:"",
+    basis:"",
+    support:"",
+  });
+  saveDraft();
+  renderCareList();
+}
+
+function renderCareList(){
+  const root = $("careList");
+  root.innerHTML = "";
+
+  if(state.cares.length === 0){
+    const empty = document.createElement("div");
+    empty.className = "muted";
+    empty.textContent = "まだ配慮事項がありません。「配慮事項を自動作成」または「手入力で追加」を押してください。";
+    root.appendChild(empty);
+    return;
+  }
+
+  state.cares.forEach((c, idx)=>{
+    const item = document.createElement("div");
+    item.className = "careItem";
+    item.innerHTML = `
+      <div class="careHead">
+        <strong>${escapeHtml(c.title || "配慮事項")}</strong>
+        <div class="careBtns">
+          <button class="mini ghost" type="button" data-move="up" data-idx="${idx}">↑</button>
+          <button class="mini ghost" type="button" data-move="down" data-idx="${idx}">↓</button>
+          <button class="mini danger" type="button" data-del="${idx}">削除</button>
+        </div>
+      </div>
+
+      <div class="row cols2">
+        <div>
+          <label>課題（何が起きている？）</label>
+          <textarea data-care="${idx}" data-field="issue" placeholder="例：相手に伝えたい気持ちが強く、口調が強くなることがある。">${escapeHtml(c.issue)}</textarea>
+        </div>
+        <div>
+          <label>根拠（できている点/背景/状況）</label>
+          <textarea data-care="${idx}" data-field="basis" placeholder="例：ルール理解はある。正しさを共有したい意欲が高い。">${escapeHtml(c.basis)}</textarea>
+        </div>
+      </div>
+
+      <div>
+        <label>支援方針・目標（次にどうする？）</label>
+        <textarea data-care="${idx}" data-field="support" placeholder="例：言い換え例を一緒に考え、使えた場面を具体的にフィードバックする。">${escapeHtml(c.support)}</textarea>
+      </div>
+    `;
+    root.appendChild(item);
+  });
+
+  // bind edits
+  root.querySelectorAll("textarea[data-care]").forEach(el=>{
+    el.addEventListener("input", ()=>{
+      const idx = Number(el.getAttribute("data-care"));
+      const field = el.getAttribute("data-field");
+      state.cares[idx][field] = el.value;
+      saveDraft();
+      generateAndRender();
+    });
+  });
+
+  // bind del/move
+  root.querySelectorAll("button[data-del]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const idx = Number(btn.getAttribute("data-del"));
+      state.cares.splice(idx, 1);
+      saveDraft();
+      renderCareList();
+      generateAndRender();
+    });
+  });
+  root.querySelectorAll("button[data-move]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const idx = Number(btn.getAttribute("data-idx"));
+      const dir = btn.getAttribute("data-move");
+      if(dir === "up" && idx > 0){
+        const t = state.cares[idx-1];
+        state.cares[idx-1] = state.cares[idx];
+        state.cares[idx] = t;
+      }
+      if(dir === "down" && idx < state.cares.length - 1){
+        const t = state.cares[idx+1];
+        state.cares[idx+1] = state.cares[idx];
+        state.cares[idx] = t;
+      }
+      saveDraft();
+      renderCareList();
+      generateAndRender();
+    });
+  });
+}
+
+/** =========================
+ *  生成ロジック
+ *  ========================= */
+function getPhrase(itemId){
+  const it = ITEMS.find(x=>x.id===itemId);
+  if(!it) return "";
+  const p = state.softTone ? (it.phrase.soft || it.phrase.default) : it.phrase.default;
+  return p || "";
+}
+
+function compactJoin(phrases, limit){
+  const uniq = [];
+  for(const p of phrases){
+    const s = p.trim();
+    if(!s) continue;
+    if(!uniq.includes(s)) uniq.push(s);
+  }
+  const part = uniq.slice(0, limit);
+  // 2件以上なら、最後は「また、」などにしないで素直に句点で並べる
+  return part.join(" ");
+}
+
+function inferGoal(domainId){
+  const x = state.selections[domainId];
+  const all = [...x.challenge, ...x.support, ...x.strength];
+  for(const r of GOAL_RULES){
+    if(r.matchIds.some(id=>all.includes(id))) return r.goal;
+  }
+  return "状況に応じて見通し提示や声かけを調整し、安定して参加できる場面を増やす。";
+}
+
+function sentenceize(text){
+  let t = (text || "").trim();
+  if(!t) return "";
+  // 句点がなければ付与
+  if(!/[。！？]$/.test(t)) t += "。";
+  return t;
+}
+
+function generateDomainText(domainId){
+  const d = DOMAINS.find(x=>x.id===domainId);
+  const x = state.selections[domainId];
+  const sceneText = sceneLabel(state.info.scene);
+
+  const strengths = [...x.strength].map(getPhrase).filter(Boolean);
+  const challenges = [...x.challenge].map(getPhrase).filter(Boolean);
+  const supports = [...x.support].map(getPhrase).filter(Boolean);
+
+  const parts = [];
+
+  // 1) 強み
+  if(strengths.length){
+    parts.push(sentenceize(compactJoin(strengths, 2)));
+  }else{
+    // 強み未選択でも破綻しない
+    parts.push("（強み：必要に応じて追記）");
+  }
+
+  // 2) 課題
+  if(challenges.length){
+    const base = compactJoin(challenges, 2);
+    const s = `一方、【場面】${sceneText}では、${x.freq}（${x.severity}）の頻度・程度で、${base}`;
+    parts.push(sentenceize(s));
+  }
+
+  // 3) 支援＋目標
+  const goal = inferGoal(domainId);
+  if(supports.length){
+    const s = `${compactJoin(supports, 2)} 今後は、${goal}`;
+    parts.push(sentenceize(s));
+  }else{
+    parts.push(sentenceize(`今後は、${goal}`));
+  }
+
+  // 4) 追加メモ
+  if(x.note && x.note.trim()){
+    parts.push(sentenceize(x.note.trim()));
+  }
+
+  let text = parts.join("");
+  if(state.softTone) text = softenText(text);
+  return `${d.title}\n${text}`;
+}
+
+function generateCareText(){
+  if(state.cares.length === 0) return "【配慮事項（次の支援・目標）】\n（未作成）";
+
+  const blocks = state.cares.map((c, i)=>{
+    const title = c.title?.trim() || `配慮事項${i+1}`;
+    const issue = c.issue?.trim() || "（未入力）";
+    const basis = c.basis?.trim() || "（未入力）";
+    const support = c.support?.trim() || "（未入力）";
+    return [
+      `（${i+1}）${title}`,
+      `- 課題：${issue.replaceAll("\n","\n  ")}`,
+      `- 根拠：${basis.replaceAll("\n","\n  ")}`,
+      `- 支援/目標：${support.replaceAll("\n","\n  ")}`,
+    ].join("\n");
+  }).join("\n\n");
+
+  return `【配慮事項（次の支援・目標）】\n${blocks}`;
+}
+
+function generateOutput(){
+  const info = state.info;
+  const head = [
+    "【記録】",
+    `日付：${info.date || nowISO()}`,
+    info.docType ? `種別：${info.docType}` : null,
+    info.author ? `作成：${info.author}` : null,
+    (info.childName || info.age) ? `対象：${[info.childName, info.age].filter(Boolean).join(" / ")}` : null,
+    `場面：${sceneLabel(info.scene)}`,
+  ].filter(Boolean).join("\n");
+
+  const overview = [
+    "【概要（観察メモ）】",
+    state.memo.rawMemo?.trim() ? state.memo.rawMemo.trim() : "（未入力）"
+  ].join("\n");
+
+  const domains = [
+    "【発達領域別所見】",
+    DOMAINS.map(d=>generateDomainText(d.id)).join("\n\n")
+  ].join("\n");
+
+  const care = generateCareText();
+
+  const append = state.memo.appendMemo?.trim()
+    ? `【追記】\n${state.memo.appendMemo.trim()}`
+    : null;
+
+  let out = [head, "", overview, "", domains, "", care, append ? "\n"+append : ""].join("\n");
+  if(state.softTone) out = softenText(out);
+  return out.trim();
+}
+
+function generateAndRender(){
+  $("out").textContent = generateOutput();
+}
+
+/** =========================
+ *  例入力（デモ）
+ *  ========================= */
+function applyExample(){
+  // 例：あなたの話の核（ルール理解はあるが、伝え方が強くなる）
+  state.info.scene = "trouble";
+  state.memo.rawMemo = "ルールの理解はあるが、相手に伝えたい気持ちが強く、強い口調になってしまう場面がある。落ち着くとやり直す姿もみられる。";
+
+  // 選択
+  const A = state.selections["A"];
+  const B = state.selections["B"];
+  const C = state.selections["C"];
+  const D = state.selections["D"];
+
+  A.strength.add("A_s_rule");
+  A.strength.add("A_s_pros");
+  A.challenge.add("A_c_shift");
+  A.support.add("A_p_visual");
+  A.support.add("A_p_pre");
+
+  B.strength.add("B_s_will");
+  B.challenge.add("B_c_tone");
+  B.support.add("B_p_phrase");
+  B.support.add("B_p_wait");
+
+  C.strength.add("C_s_join");
+  C.challenge.add("C_c_strong");
+  C.challenge.add("C_c_point");
+  C.support.add("C_p_words");
+  C.support.add("C_p_praise");
+
+  D.strength.add("D_s_recover");
+  D.challenge.add("D_c_escalate");
+  D.support.add("D_p_cool");
+  D.support.add("D_p_reflect");
+
+  // 配慮自動生成
+  state.cares = [];
+  autoGenerateCares();
+
+  saveDraft();
+  // UI反映
+  $("scene").value = state.info.scene;
+  $("rawMemo").value = state.memo.rawMemo;
+  renderDomains();
+  renderCareList();
+  generateAndRender();
+  renderDomainCounts();
+  setStep(2);
+}
+
+/** =========================
+ *  コピー/保存/リセット
+ *  ========================= */
+async function copyOutput(){
+  const text = $("out").textContent;
+  try{
+    await navigator.clipboard.writeText(text);
+    alert("コピーしました。");
+  }catch(e){
+    alert("コピーに失敗しました。ブラウザの権限設定を確認してください。");
+  }
+}
+
+function downloadTxt(){
+  const text = $("out").textContent;
+  const blob = new Blob([text], {type:"text/plain;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `dev_record_${state.info.date || nowISO()}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(a.href);
+}
+
+function resetAll(){
+  if(!confirm("端末内データを削除して初期化します。よろしいですか？")) return;
+  localStorage.removeItem(STORAGE_KEY);
+  location.reload();
+}
+
+/** =========================
+ *  イベントバインド
+ *  ========================= */
+function bindBasics(){
+  $("childName").addEventListener("input", ()=>{ state.info.childName = $("childName").value; saveDraft(); generateAndRender(); });
+  $("age").addEventListener("input", ()=>{ state.info.age = $("age").value; saveDraft(); generateAndRender(); });
+  $("date").addEventListener("change", ()=>{ state.info.date = $("date").value; saveDraft(); generateAndRender(); });
+  $("docType").addEventListener("input", ()=>{ state.info.docType = $("docType").value; saveDraft(); generateAndRender(); });
+  $("author").addEventListener("input", ()=>{ state.info.author = $("author").value; saveDraft(); generateAndRender(); });
+
+  $("scene").addEventListener("change", ()=>{
+    state.info.scene = $("scene").value;
+    saveDraft();
+    renderDomains(); // 場面で表示が変わる
+    generateAndRender();
+    renderDomainCounts();
+  });
+
+  $("search").addEventListener("input", ()=>{
+    state.info.search = $("search").value;
+    saveDraft();
+    renderDomains();
+    generateAndRender();
+    renderDomainCounts();
+  });
+
+  $("rawMemo").addEventListener("input", ()=>{
+    state.memo.rawMemo = $("rawMemo").value;
+    saveDraft();
+    generateAndRender();
+  });
+  $("appendMemo").addEventListener("input", ()=>{
+    state.memo.appendMemo = $("appendMemo").value;
+    saveDraft();
+    generateAndRender();
+  });
+
+  $("softTone").addEventListener("change", ()=>{
+    state.softTone = $("softTone").checked;
+    saveDraft();
+    generateAndRender();
+  });
+}
+
+function bindTopButtons(){
+  $("btnCopy").addEventListener("click", copyOutput);
+  $("btnDownload").addEventListener("click", downloadTxt);
+  $("btnReset").addEventListener("click", resetAll);
+
+  $("btnGenerate").addEventListener("click", generateAndRender);
+  $("btnGenerate2").addEventListener("click", generateAndRender);
+  $("btnExample").addEventListener("click", applyExample);
+
+  $("btnExpandAll").addEventListener("click", ()=>{
+    document.querySelectorAll("#domains details").forEach(d=>d.open=true);
+  });
+  $("btnCollapseAll").addEventListener("click", ()=>{
+    document.querySelectorAll("#domains details").forEach(d=>d.open=false);
+  });
+  $("btnClearAll").addEventListener("click", clearAllSelections);
+
+  $("btnAutoCare").addEventListener("click", autoGenerateCares);
+  $("btnAddCare").addEventListener("click", addManualCareItem);
+}
+
+function hydrateInputs(){
+  $("childName").value = state.info.childName || "";
+  $("age").value = state.info.age || "";
+  $("date").value = state.info.date || nowISO();
+  $("docType").value = state.info.docType || "";
+  $("author").value = state.info.author || "";
+  $("scene").value = state.info.scene || "free";
+  $("search").value = state.info.search || "";
+  $("rawMemo").value = state.memo.rawMemo || "";
+  $("appendMemo").value = state.memo.appendMemo || "";
+  $("softTone").checked = !!state.softTone;
+}
+
+function bootstrap(){
+  initState();
+  const loaded = loadDraft();
+  if(!loaded){
+    // 初回は今日の日付
+    state.info.date = nowISO();
+  }
+
+  renderTabs();
+  renderScenes();
+  hydrateInputs();
+  bindBasics();
+  bindTopButtons();
+
+  renderDomains();
+  renderCareList();
+  generateAndRender();
+  renderDomainCounts();
+  setStep(state.step || 1);
+}
+
+bootstrap();
+</script>
+</body>
+  </html>
